@@ -1,0 +1,10 @@
+textarea.subtaskResultInput {
+    height: auto;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.subtaskResultEdit {
+    cursor: pointer;
+    float: right;
+}
