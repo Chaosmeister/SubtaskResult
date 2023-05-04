@@ -34,7 +34,8 @@ class Plugin extends Base
 
     public function getPluginDescription()
     {
-        return 'Add a freely editable field in the subtasks to store results or similar things in';
+        return 'Add a freely editable field in the subtasks to store results or similar things in.
+works with Markdown Plus';
     }
 
     public function getPluginAuthor()
@@ -45,5 +46,10 @@ class Plugin extends Base
     public function getPluginVersion()
     {
         return '1.0.0';
+    }
+
+    public function getPluginHomepage()
+    {
+        return 'https://github.com/Chaosmeister/SubtaskResult';
     }
 }
