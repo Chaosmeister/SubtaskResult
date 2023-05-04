@@ -1,1 +1,0 @@
-<th class="column-30"><?= t('Result') ?></th>
