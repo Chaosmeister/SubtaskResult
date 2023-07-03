@@ -10,12 +10,22 @@ class Plugin extends Base
     {
         $this->template->hook->attach("template:subtask:table:header:before-timetracking", "subtaskResult:Subtask/show");
         $this->template->hook->attach("template:subtask:table:rows", "SubtaskResult:Subtask/rows");
+        $this->template->setTemplateOverride('event/subtask_update', 'SubtaskResult:event/subtask_update');
 
         $this->hook->on('template:layout:js', array('template' => 'plugins/SubtaskResult/Assets/js/functions.js'));
         $this->hook->on('template:layout:css', array('template' => 'plugins/SubtaskResult/Assets/css/result.css'));
 
         $this->route->addRoute('SubtaskResult/save', 'SubtaskResultController', 'save', 'SubtaskResult');
         $this->route->addRoute('SubtaskResult/get', 'SubtaskResultController', 'get', 'SubtaskResult');
+
+        $this->hook->on('model:task:project_duplication:aftersave', function ($hook_values) {
+            $sourceSubtasks = $this->subtaskModel->getAll($hook_values['source_task_id']);
+            $destinationSubtasks = $this->subtaskModel->getAll($hook_values['destination_task_id']);
+
+            foreach ($sourceSubtasks as $index => $unused) {
+                $this->subtaskResultModel->copy($sourceSubtasks[$index]['id'], $destinationSubtasks[$index]['id']);
+            }
+        });
     }
 
     public function getPluginName()
@@ -28,6 +38,9 @@ class Plugin extends Base
         return array(
             'Plugin\SubtaskResult\Model' => array(
                 'SubtaskResultModel'
+            ),
+            'Plugin\SubtaskResult\Controller' => array(
+                'SubtaskResultController'
             )
         );
     }

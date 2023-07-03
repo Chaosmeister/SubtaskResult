@@ -1,70 +1,61 @@
 KB.on('dom.ready', function () {
-    var Subtasks = document.getElementsByClassName('subtasks-table')[0];
+    $(document).on('click', '.js-subtask-result-edit', function (e) {
+        var el = $(this);
+        var url = el.attr('href');
 
-    const Cells = [...Subtasks.getElementsByClassName('subtaskResultEdit')];
-    for (const Cell of Cells) {
-        Cell.addEventListener("click", toggleEdit);
-    }
-})
+        e.preventDefault();
 
-function findTD(Element) {
-    var td = Element;
+        $.ajax({
+            cache: false,
+            url: url,
+            success: function (data) {
+                var Elements = $(el).closest('.subtaskResult');
+                var td = Elements[0];
+                
+                var MarkdownDisplay = td.children[0];
+                MarkdownDisplay.style.display="none";
 
-    while (td.className != "subtaskResult") {
-        td = td.parentElement;
-    }
-    return td;
-}
+                td.innerHTML += data;
 
-function toggleEdit(event) {
-    var td = findTD(event.target);
-    var subtaskId = td.parentElement.attributes['data-subtask-id'].nodeValue;
-
-    KB.http.get("?controller=SubtaskResultController&action=get&plugin=SubtaskResult&Id=" + subtaskId)
-        .success(function (result) {
-            const Markdown = td.querySelector('.subtaskResultDisplay');
-            Markdown.style.display = "none";
-
-            const TextArea = document.createElement("textarea");
-            TextArea.className = "subtaskResultInput";
-
-            const textnode = document.createTextNode(result);
-            TextArea.appendChild(textnode);
-            TextArea.id = subtaskId;
-
-            TextArea.style.width = td.clientWidth + "px";
-            TextArea.style.display = "";
-
-            td.appendChild(TextArea);
-
-            const Buttons = document.createElement("div");
-            Buttons.className = "subtaskResultButtons"
-
-            const SaveButton = document.createElement("div");
-            SaveButton.className = "subtaskResultSave";
-
-            SaveButton.innerHTML = '<i class="fa fa-fw fa-save button" aria-hidden="true" style="cursor: pointer;"/>';
-
-            Buttons.appendChild(SaveButton);
-
-            const CloseButton = document.createElement("div");
-            CloseButton.className = "subtaskResultClose";
-
-            CloseButton.innerHTML = '<i class="fa fa-fw fa-close button" aria-hidden="true" style="cursor: pointer;"/>';
-
-            Buttons.appendChild(CloseButton);
-
-            Buttons.style.display = "flex"
-
-            td.appendChild(Buttons);
-
-            TextArea.addEventListener("input", resizeEvent);
-            SaveButton.addEventListener("click", save);
-            CloseButton.addEventListener("click", close);
-
-            resize(TextArea);
+                var TextArea = td.children[1].children[0];
+                TextArea.style.width = "100%";
+                TextArea.style.padding = "0px";
+                resize(TextArea);
+            }
         });
-}
+    });
+
+    $(document).on('input', '.subtaskResultInput', function (e) {
+        e.preventDefault();
+        resizeEvent(e);
+    });
+
+    $(document).on('click', '.js-subtask-result-save', function (e) {
+        e.preventDefault();
+        
+        const link = '?controller=SubtaskResultController&action=save&plugin=SubtaskResult';
+    
+        var subtaskResultJson = {};
+    
+        const Inputs = [...document.getElementsByClassName('subtaskResultInput')];
+        for (const Input of Inputs) {
+            subtaskResultJson[Input.id] = Input.value;
+        }
+    
+        KB.http.postJson(link, subtaskResultJson);
+    });
+
+    $(document).on('click', '.js-subtask-result-close', function (e) {
+        e.preventDefault();
+        var el = $(this);
+
+        td = el.closest(".subtaskResult")[0];
+        var markdown = td.querySelector('.subtaskResultDisplay');
+        markdown.style.display = "";
+    
+        td.removeChild(td.querySelector('.subtaskResultEdit'));
+    });
+});
 
 function resizeEvent(event) {
     resize(event.target);
@@ -72,30 +63,5 @@ function resizeEvent(event) {
 
 function resize(element) {
     element.style.height = "";
-    element.style.height = element.scrollHeight - 8 + "px";
-}
-
-function close(event) {
-    var td = findTD(event.target);
-
-    var markdown = td.querySelector('.subtaskResultDisplay');
-    markdown.style.display = "";
-
-    td.removeChild(td.querySelector('.subtaskResultInput'));
-    td.removeChild(td.querySelector('.subtaskResultButtons'));
-
-    event.stopPropagation();
-}
-
-function save(e) {
-    const link = '?controller=SubtaskResultController&action=save&plugin=SubtaskResult';
-
-    var subtaskResultJson = {};
-
-    const Inputs = [...document.getElementsByClassName('subtaskResultInput')];
-    for (const Input of Inputs) {
-        subtaskResultJson[Input.id] = Input.value;
-    }
-
-    KB.http.postJson(link, subtaskResultJson);
+    element.style.height = element.scrollHeight + "px";
 }
