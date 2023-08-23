@@ -17,6 +17,7 @@ class SubtaskResultModel extends Base
         if (isset($result['text'])) {
             return $result['text'];
         }
+        return "";
     }
 
     public function save($Id, $Text)
