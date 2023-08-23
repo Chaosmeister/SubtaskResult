@@ -8,12 +8,12 @@ class SubtaskResultModel extends Base
 {
     protected function getTable()
     {
-        return "subtaskResult";
+        return "subtask_result";
     }
 
-    public function getById($Id)
+    public function getById($id)
     {
-        $result = $this->db->table($this->getTable())->eq('id', $Id)->findOne();
+        $result = $this->db->table($this->getTable())->eq('id', $id)->findOne();
         if (isset($result['text'])) {
             return $result['text'];
         }
