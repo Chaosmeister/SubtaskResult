@@ -8,8 +8,8 @@ class Plugin extends Base
 {
     public function initialize()
     {
-        $this->template->hook->attach("template:subtask:table:header:before-timetracking", "subtaskResult:Subtask/show");
-        $this->template->hook->attach("template:subtask:table:rows", "SubtaskResult:Subtask/rows");
+        $this->template->hook->attach("template:subtask:table:header:before-timetracking", "SubtaskResult:subtask/show");
+        $this->template->hook->attach("template:subtask:table:rows", "SubtaskResult:subtask/rows");
         $this->template->setTemplateOverride('event/subtask_update', 'SubtaskResult:event/subtask_update');
 
         $this->hook->on('template:layout:js', array('template' => 'plugins/SubtaskResult/Assets/js/functions.js'));
