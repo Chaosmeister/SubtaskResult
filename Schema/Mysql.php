@@ -11,7 +11,7 @@ function version_1(PDO $pdo)
     $pdo->exec("
         CREATE TABLE subtaskResult (
             id INT,
-            `text` TEXT,
+            'text' TEXT,
             CONSTRAINT subtaskResult FOREIGN KEY (id) REFERENCES subtasks(id) ON DELETE CASCADE
         );
     ");
